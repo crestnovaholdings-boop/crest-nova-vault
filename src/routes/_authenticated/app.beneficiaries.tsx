@@ -22,7 +22,7 @@ const schema = z.object({
   name: z.string().min(1),
   bank_name: z.string().min(1),
   account_number: z.string().min(3),
-  currency: z.string().length(3).default("USD"),
+  currency: z.string().length(3),
   country: z.string().optional(),
   swift: z.string().optional(),
   iban: z.string().optional(),

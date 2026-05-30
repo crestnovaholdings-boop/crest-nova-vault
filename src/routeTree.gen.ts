@@ -23,6 +23,15 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAppWithdrawalsRouteImport } from './routes/_authenticated/app.withdrawals'
+import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated/app.transfers'
+import { Route as AuthenticatedAppTransactionsRouteImport } from './routes/_authenticated/app.transactions'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated/app.profile'
+import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_authenticated/app.notifications'
+import { Route as AuthenticatedAppDepositsRouteImport } from './routes/_authenticated/app.deposits'
+import { Route as AuthenticatedAppBeneficiariesRouteImport } from './routes/_authenticated/app.beneficiaries'
+import { Route as AuthenticatedAppAccountsRouteImport } from './routes/_authenticated/app.accounts'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -93,6 +102,58 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppWithdrawalsRoute =
+  AuthenticatedAppWithdrawalsRouteImport.update({
+    id: '/withdrawals',
+    path: '/withdrawals',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppTransfersRoute =
+  AuthenticatedAppTransfersRouteImport.update({
+    id: '/transfers',
+    path: '/transfers',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppTransactionsRoute =
+  AuthenticatedAppTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppNotificationsRoute =
+  AuthenticatedAppNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppDepositsRoute =
+  AuthenticatedAppDepositsRouteImport.update({
+    id: '/deposits',
+    path: '/deposits',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppBeneficiariesRoute =
+  AuthenticatedAppBeneficiariesRouteImport.update({
+    id: '/beneficiaries',
+    path: '/beneficiaries',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAccountsRoute =
+  AuthenticatedAppAccountsRouteImport.update({
+    id: '/accounts',
+    path: '/accounts',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -107,7 +168,16 @@ export interface FileRoutesByFullPath {
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/app': typeof AuthenticatedAppRoute
+  '/app': typeof AuthenticatedAppRouteWithChildren
+  '/app/accounts': typeof AuthenticatedAppAccountsRoute
+  '/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
+  '/app/deposits': typeof AuthenticatedAppDepositsRoute
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/transactions': typeof AuthenticatedAppTransactionsRoute
+  '/app/transfers': typeof AuthenticatedAppTransfersRoute
+  '/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -122,7 +192,15 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/app': typeof AuthenticatedAppRoute
+  '/app/accounts': typeof AuthenticatedAppAccountsRoute
+  '/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
+  '/app/deposits': typeof AuthenticatedAppDepositsRoute
+  '/app/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/app/profile': typeof AuthenticatedAppProfileRoute
+  '/app/transactions': typeof AuthenticatedAppTransactionsRoute
+  '/app/transfers': typeof AuthenticatedAppTransfersRoute
+  '/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,7 +217,16 @@ export interface FileRoutesById {
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/app': typeof AuthenticatedAppRoute
+  '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/app/accounts': typeof AuthenticatedAppAccountsRoute
+  '/_authenticated/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
+  '/_authenticated/app/deposits': typeof AuthenticatedAppDepositsRoute
+  '/_authenticated/app/notifications': typeof AuthenticatedAppNotificationsRoute
+  '/_authenticated/app/profile': typeof AuthenticatedAppProfileRoute
+  '/_authenticated/app/transactions': typeof AuthenticatedAppTransactionsRoute
+  '/_authenticated/app/transfers': typeof AuthenticatedAppTransfersRoute
+  '/_authenticated/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -157,6 +244,15 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin'
     | '/app'
+    | '/app/accounts'
+    | '/app/beneficiaries'
+    | '/app/deposits'
+    | '/app/notifications'
+    | '/app/profile'
+    | '/app/transactions'
+    | '/app/transfers'
+    | '/app/withdrawals'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,6 +267,14 @@ export interface FileRouteTypes {
     | '/security'
     | '/services'
     | '/admin'
+    | '/app/accounts'
+    | '/app/beneficiaries'
+    | '/app/deposits'
+    | '/app/notifications'
+    | '/app/profile'
+    | '/app/transactions'
+    | '/app/transfers'
+    | '/app/withdrawals'
     | '/app'
   id:
     | '__root__'
@@ -188,6 +292,15 @@ export interface FileRouteTypes {
     | '/services'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/app/accounts'
+    | '/_authenticated/app/beneficiaries'
+    | '/_authenticated/app/deposits'
+    | '/_authenticated/app/notifications'
+    | '/_authenticated/app/profile'
+    | '/_authenticated/app/transactions'
+    | '/_authenticated/app/transfers'
+    | '/_authenticated/app/withdrawals'
+    | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -305,17 +418,107 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/withdrawals': {
+      id: '/_authenticated/app/withdrawals'
+      path: '/withdrawals'
+      fullPath: '/app/withdrawals'
+      preLoaderRoute: typeof AuthenticatedAppWithdrawalsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/transfers': {
+      id: '/_authenticated/app/transfers'
+      path: '/transfers'
+      fullPath: '/app/transfers'
+      preLoaderRoute: typeof AuthenticatedAppTransfersRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/transactions': {
+      id: '/_authenticated/app/transactions'
+      path: '/transactions'
+      fullPath: '/app/transactions'
+      preLoaderRoute: typeof AuthenticatedAppTransactionsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/notifications': {
+      id: '/_authenticated/app/notifications'
+      path: '/notifications'
+      fullPath: '/app/notifications'
+      preLoaderRoute: typeof AuthenticatedAppNotificationsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/deposits': {
+      id: '/_authenticated/app/deposits'
+      path: '/deposits'
+      fullPath: '/app/deposits'
+      preLoaderRoute: typeof AuthenticatedAppDepositsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/beneficiaries': {
+      id: '/_authenticated/app/beneficiaries'
+      path: '/beneficiaries'
+      fullPath: '/app/beneficiaries'
+      preLoaderRoute: typeof AuthenticatedAppBeneficiariesRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/accounts': {
+      id: '/_authenticated/app/accounts'
+      path: '/accounts'
+      fullPath: '/app/accounts'
+      preLoaderRoute: typeof AuthenticatedAppAccountsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
   }
 }
 
+interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppAccountsRoute: typeof AuthenticatedAppAccountsRoute
+  AuthenticatedAppBeneficiariesRoute: typeof AuthenticatedAppBeneficiariesRoute
+  AuthenticatedAppDepositsRoute: typeof AuthenticatedAppDepositsRoute
+  AuthenticatedAppNotificationsRoute: typeof AuthenticatedAppNotificationsRoute
+  AuthenticatedAppProfileRoute: typeof AuthenticatedAppProfileRoute
+  AuthenticatedAppTransactionsRoute: typeof AuthenticatedAppTransactionsRoute
+  AuthenticatedAppTransfersRoute: typeof AuthenticatedAppTransfersRoute
+  AuthenticatedAppWithdrawalsRoute: typeof AuthenticatedAppWithdrawalsRoute
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+}
+
+const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppAccountsRoute: AuthenticatedAppAccountsRoute,
+  AuthenticatedAppBeneficiariesRoute: AuthenticatedAppBeneficiariesRoute,
+  AuthenticatedAppDepositsRoute: AuthenticatedAppDepositsRoute,
+  AuthenticatedAppNotificationsRoute: AuthenticatedAppNotificationsRoute,
+  AuthenticatedAppProfileRoute: AuthenticatedAppProfileRoute,
+  AuthenticatedAppTransactionsRoute: AuthenticatedAppTransactionsRoute,
+  AuthenticatedAppTransfersRoute: AuthenticatedAppTransfersRoute,
+  AuthenticatedAppWithdrawalsRoute: AuthenticatedAppWithdrawalsRoute,
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+}
+
+const AuthenticatedAppRouteWithChildren =
+  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedAppRoute: typeof AuthenticatedAppRoute
+  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedAppRoute: AuthenticatedAppRoute,
+  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
