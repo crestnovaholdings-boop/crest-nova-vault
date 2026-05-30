@@ -42,7 +42,7 @@ export function AdminSidebar() {
             <SidebarMenu>
               {items.map((i) => (
                 <SidebarMenuItem key={i.to}>
-                  <SidebarMenuButton asChild isActive={isActive(i.to, i.exact)} tooltip={i.label}>
+                  <SidebarMenuButton asChild isActive={isActive(i.to, ("exact" in i ? i.exact : false))} tooltip={i.label}>
                     <Link to={i.to}><i.icon /> <span>{i.label}</span></Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
