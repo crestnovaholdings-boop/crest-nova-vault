@@ -24,6 +24,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/app.index'
+import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
 import { Route as AuthenticatedAppWithdrawalsRouteImport } from './routes/_authenticated/app.withdrawals'
 import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated/app.transfers'
 import { Route as AuthenticatedAppTransactionsRouteImport } from './routes/_authenticated/app.transactions'
@@ -32,6 +33,12 @@ import { Route as AuthenticatedAppNotificationsRouteImport } from './routes/_aut
 import { Route as AuthenticatedAppDepositsRouteImport } from './routes/_authenticated/app.deposits'
 import { Route as AuthenticatedAppBeneficiariesRouteImport } from './routes/_authenticated/app.beneficiaries'
 import { Route as AuthenticatedAppAccountsRouteImport } from './routes/_authenticated/app.accounts'
+import { Route as AuthenticatedAdminUsersRouteImport } from './routes/_authenticated/admin.users'
+import { Route as AuthenticatedAdminTransactionsRouteImport } from './routes/_authenticated/admin.transactions'
+import { Route as AuthenticatedAdminManualRouteImport } from './routes/_authenticated/admin.manual'
+import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated/admin.cms'
+import { Route as AuthenticatedAdminApprovalsRouteImport } from './routes/_authenticated/admin.approvals'
+import { Route as AuthenticatedAdminActivityRouteImport } from './routes/_authenticated/admin.activity'
 
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
@@ -107,6 +114,11 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
 const AuthenticatedAppWithdrawalsRoute =
   AuthenticatedAppWithdrawalsRouteImport.update({
     id: '/withdrawals',
@@ -154,6 +166,40 @@ const AuthenticatedAppAccountsRoute =
     path: '/accounts',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAdminUsersRoute = AuthenticatedAdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminTransactionsRoute =
+  AuthenticatedAdminTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminManualRoute =
+  AuthenticatedAdminManualRouteImport.update({
+    id: '/manual',
+    path: '/manual',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCmsRoute = AuthenticatedAdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminApprovalsRoute =
+  AuthenticatedAdminApprovalsRouteImport.update({
+    id: '/approvals',
+    path: '/approvals',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminActivityRoute =
+  AuthenticatedAdminActivityRouteImport.update({
+    id: '/activity',
+    path: '/activity',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -167,8 +213,14 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/admin/manual': typeof AuthenticatedAdminManualRoute
+  '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/accounts': typeof AuthenticatedAppAccountsRoute
   '/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
   '/app/deposits': typeof AuthenticatedAppDepositsRoute
@@ -177,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/app/transactions': typeof AuthenticatedAppTransactionsRoute
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesByTo {
@@ -191,7 +244,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
-  '/admin': typeof AuthenticatedAdminRoute
+  '/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/admin/manual': typeof AuthenticatedAdminManualRoute
+  '/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/admin/users': typeof AuthenticatedAdminUsersRoute
   '/app/accounts': typeof AuthenticatedAppAccountsRoute
   '/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
   '/app/deposits': typeof AuthenticatedAppDepositsRoute
@@ -200,6 +258,7 @@ export interface FileRoutesByTo {
   '/app/transactions': typeof AuthenticatedAppTransactionsRoute
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRoutesById {
@@ -216,8 +275,14 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/security': typeof SecurityRoute
   '/services': typeof ServicesRoute
-  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
+  '/_authenticated/admin/activity': typeof AuthenticatedAdminActivityRoute
+  '/_authenticated/admin/approvals': typeof AuthenticatedAdminApprovalsRoute
+  '/_authenticated/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/_authenticated/admin/manual': typeof AuthenticatedAdminManualRoute
+  '/_authenticated/admin/transactions': typeof AuthenticatedAdminTransactionsRoute
+  '/_authenticated/admin/users': typeof AuthenticatedAdminUsersRoute
   '/_authenticated/app/accounts': typeof AuthenticatedAppAccountsRoute
   '/_authenticated/app/beneficiaries': typeof AuthenticatedAppBeneficiariesRoute
   '/_authenticated/app/deposits': typeof AuthenticatedAppDepositsRoute
@@ -226,6 +291,7 @@ export interface FileRoutesById {
   '/_authenticated/app/transactions': typeof AuthenticatedAppTransactionsRoute
   '/_authenticated/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/_authenticated/app/withdrawals': typeof AuthenticatedAppWithdrawalsRoute
+  '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
 }
 export interface FileRouteTypes {
@@ -244,6 +310,12 @@ export interface FileRouteTypes {
     | '/services'
     | '/admin'
     | '/app'
+    | '/admin/activity'
+    | '/admin/approvals'
+    | '/admin/cms'
+    | '/admin/manual'
+    | '/admin/transactions'
+    | '/admin/users'
     | '/app/accounts'
     | '/app/beneficiaries'
     | '/app/deposits'
@@ -252,6 +324,7 @@ export interface FileRouteTypes {
     | '/app/transactions'
     | '/app/transfers'
     | '/app/withdrawals'
+    | '/admin/'
     | '/app/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -266,7 +339,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/security'
     | '/services'
-    | '/admin'
+    | '/admin/activity'
+    | '/admin/approvals'
+    | '/admin/cms'
+    | '/admin/manual'
+    | '/admin/transactions'
+    | '/admin/users'
     | '/app/accounts'
     | '/app/beneficiaries'
     | '/app/deposits'
@@ -275,6 +353,7 @@ export interface FileRouteTypes {
     | '/app/transactions'
     | '/app/transfers'
     | '/app/withdrawals'
+    | '/admin'
     | '/app'
   id:
     | '__root__'
@@ -292,6 +371,12 @@ export interface FileRouteTypes {
     | '/services'
     | '/_authenticated/admin'
     | '/_authenticated/app'
+    | '/_authenticated/admin/activity'
+    | '/_authenticated/admin/approvals'
+    | '/_authenticated/admin/cms'
+    | '/_authenticated/admin/manual'
+    | '/_authenticated/admin/transactions'
+    | '/_authenticated/admin/users'
     | '/_authenticated/app/accounts'
     | '/_authenticated/app/beneficiaries'
     | '/_authenticated/app/deposits'
@@ -300,6 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/transactions'
     | '/_authenticated/app/transfers'
     | '/_authenticated/app/withdrawals'
+    | '/_authenticated/admin/'
     | '/_authenticated/app/'
   fileRoutesById: FileRoutesById
 }
@@ -425,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/admin/': {
+      id: '/_authenticated/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/app/withdrawals': {
       id: '/_authenticated/app/withdrawals'
       path: '/withdrawals'
@@ -481,8 +574,73 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountsRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/admin/users': {
+      id: '/_authenticated/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AuthenticatedAdminUsersRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/transactions': {
+      id: '/_authenticated/admin/transactions'
+      path: '/transactions'
+      fullPath: '/admin/transactions'
+      preLoaderRoute: typeof AuthenticatedAdminTransactionsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/manual': {
+      id: '/_authenticated/admin/manual'
+      path: '/manual'
+      fullPath: '/admin/manual'
+      preLoaderRoute: typeof AuthenticatedAdminManualRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/cms': {
+      id: '/_authenticated/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AuthenticatedAdminCmsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/approvals': {
+      id: '/_authenticated/admin/approvals'
+      path: '/approvals'
+      fullPath: '/admin/approvals'
+      preLoaderRoute: typeof AuthenticatedAdminApprovalsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/activity': {
+      id: '/_authenticated/admin/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AuthenticatedAdminActivityRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
   }
 }
+
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminActivityRoute: typeof AuthenticatedAdminActivityRoute
+  AuthenticatedAdminApprovalsRoute: typeof AuthenticatedAdminApprovalsRoute
+  AuthenticatedAdminCmsRoute: typeof AuthenticatedAdminCmsRoute
+  AuthenticatedAdminManualRoute: typeof AuthenticatedAdminManualRoute
+  AuthenticatedAdminTransactionsRoute: typeof AuthenticatedAdminTransactionsRoute
+  AuthenticatedAdminUsersRoute: typeof AuthenticatedAdminUsersRoute
+  AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminActivityRoute: AuthenticatedAdminActivityRoute,
+  AuthenticatedAdminApprovalsRoute: AuthenticatedAdminApprovalsRoute,
+  AuthenticatedAdminCmsRoute: AuthenticatedAdminCmsRoute,
+  AuthenticatedAdminManualRoute: AuthenticatedAdminManualRoute,
+  AuthenticatedAdminTransactionsRoute: AuthenticatedAdminTransactionsRoute,
+  AuthenticatedAdminUsersRoute: AuthenticatedAdminUsersRoute,
+  AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAccountsRoute: typeof AuthenticatedAppAccountsRoute
@@ -512,12 +670,12 @@ const AuthenticatedAppRouteWithChildren =
   AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
 }
 
