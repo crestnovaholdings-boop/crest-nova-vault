@@ -191,7 +191,7 @@ export const updateUserStatus = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     await requireAdmin(context.userId);
-    const update: Record<string, unknown> = {};
+    const update: { account_status?: "active" | "frozen" | "suspended" | "closed"; kyc_status?: "not_submitted" | "pending" | "approved" | "rejected" } = {};
     if (data.account_status) update.account_status = data.account_status;
     if (data.kyc_status) update.kyc_status = data.kyc_status;
     const { error } = await supabaseAdmin.from("profiles").update(update).eq("id", data.id);
