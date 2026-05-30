@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/site/site-layout";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
@@ -37,7 +37,3 @@ export function CTASection() {
   );
 }
 
-// fallback route export so this file isn't treated as a route
-export const Route = createFileRoute("/_shared")({
-  component: () => null,
-});
