@@ -226,7 +226,7 @@ export const approveTransaction = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context.userId);
     const { error } = await supabaseAdmin.rpc("apply_transaction", {
-      _txn_id: data.id, _admin_id: context.userId, _note: data.note ?? null,
+      _txn_id: data.id, _admin_id: context.userId, _note: data.note,
     });
     if (error) throw new Error(error.message);
     await logAdmin(context.userId, "approve_transaction", "transaction", data.id);
@@ -239,7 +239,7 @@ export const rejectTransaction = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await requireAdmin(context.userId);
     const { error } = await supabaseAdmin.rpc("reject_transaction", {
-      _txn_id: data.id, _admin_id: context.userId, _note: data.note ?? null,
+      _txn_id: data.id, _admin_id: context.userId, _note: data.note,
     });
     if (error) throw new Error(error.message);
     await logAdmin(context.userId, "reject_transaction", "transaction", data.id);
