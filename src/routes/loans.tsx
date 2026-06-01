@@ -57,12 +57,22 @@ function LoansPage() {
       </section>
 
       <section className="py-16 bg-surface">
-        <div className="container mx-auto px-4 lg:px-8 text-center max-w-2xl">
-          <h2 className="font-display text-2xl md:text-3xl font-bold">Pre-qualify in 60 seconds</h2>
-          <p className="mt-3 text-muted-foreground">No impact on your credit score. Real rates from real underwriters.</p>
-          <Button asChild size="lg" className="mt-6 bg-gradient-hero">
-            <Link to="/register">Check my rate</Link>
-          </Button>
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3]">
+            <img
+              src="https://dashboard.thefinanser.com/wp-content/uploads/2025/05/Branches.jpg"
+              alt="Crest Nova branch network"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-center lg:text-left max-w-xl">
+            <h2 className="font-display text-2xl md:text-3xl font-bold">Pre-qualify in 60 seconds</h2>
+            <p className="mt-3 text-muted-foreground">No impact on your credit score. Real rates from real underwriters.</p>
+            <Button asChild size="lg" className="mt-6 bg-gradient-hero">
+              <Link to="/register">Check my rate</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
