@@ -36,6 +36,7 @@ function ServicesPage() {
         eyebrow="What we do"
         title="A complete financial stack, in one platform"
         subtitle="Whether you're managing a household, scaling a company, or preserving generational wealth — Crest Nova has the right product."
+        bgImage="https://onemoneyway.com/wp-content/uploads/2024/08/clerk-counting-cash-money-at-bank-office-2023-11-27-05-01-17-utc-1.jpg"
       />
 
       <section className="py-20">
