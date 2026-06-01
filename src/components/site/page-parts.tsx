@@ -3,9 +3,19 @@ import { SiteLayout } from "@/components/site/site-layout";
 import { Button } from "@/components/ui/button";
 import type { ReactNode } from "react";
 
-export function PageHeader({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle: string }) {
+export function PageHeader({ eyebrow, title, subtitle, bgImage }: { eyebrow: string; title: string; subtitle: string; bgImage?: string }) {
   return (
     <section className="relative bg-gradient-hero text-primary-foreground py-20 md:py-28 overflow-hidden">
+      {bgImage && (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${bgImage})` }}
+            aria-hidden
+          />
+          <div className="absolute inset-0 bg-gradient-hero/90" style={{ background: "linear-gradient(135deg, oklch(0.2 0.05 260 / 0.85), oklch(0.15 0.05 260 / 0.75))" }} />
+        </>
+      )}
       <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, oklch(0.78 0.11 80 / 0.4), transparent 50%)" }} />
       <div className="container relative mx-auto px-4 lg:px-8 text-center max-w-3xl">
         <div className="text-xs uppercase tracking-widest text-gold mb-3">{eyebrow}</div>
