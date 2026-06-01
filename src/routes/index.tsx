@@ -222,6 +222,128 @@ function Index() {
         </div>
       </section>
 
+      {/* PRIVATE BANKING SPLIT */}
+      <section className="py-20 lg:py-28 bg-surface">
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3]">
+            <img
+              src="https://media.istockphoto.com/id/1927881398/photo/group-of-business-persons-talking-in-the-office.jpg"
+              alt="Crest Nova advisors meeting with clients"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div className="text-xs uppercase tracking-widest text-gold mb-3">Private banking</div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">A dedicated advisor for every chapter of your wealth</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              From your first paycheck to your family office, the Crest Nova private banking desk pairs you with a senior advisor and a discreet team that already knows your goals before you walk in.
+            </p>
+            <ul className="mt-6 space-y-3 text-sm">
+              {["Bespoke lending and structured credit", "Tax-aware portfolio construction", "Concierge and lifestyle services 24/7"].map((b) => (
+                <li key={b} className="flex items-start gap-3">
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-gold/15 text-gold flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3" />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+            <Button asChild size="lg" className="mt-8 bg-gradient-hero">
+              <Link to="/services">Explore private banking <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* BRANCHES BANNER */}
+      <section className="relative py-24 lg:py-32 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(https://dashboard.thefinanser.com/wp-content/uploads/2025/05/Branches.jpg)" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.15 0.05 260 / 0.88), oklch(0.18 0.05 260 / 0.72))" }} />
+        <div className="relative container mx-auto px-4 lg:px-8 text-primary-foreground text-center max-w-3xl">
+          <div className="text-xs uppercase tracking-widest text-gold mb-3">Global footprint</div>
+          <h2 className="font-display text-3xl md:text-5xl font-bold">A branch network without the branch lines</h2>
+          <p className="mt-4 opacity-90 max-w-2xl mx-auto">
+            Walk into one of our flagship lounges in New York, London, Singapore, or Dubai — or carry the same private bank in your pocket, everywhere else.
+          </p>
+          <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { v: "42", l: "Flagship lounges" },
+              { v: "180+", l: "Countries served" },
+              { v: "24/7", l: "Concierge desk" },
+              { v: "$12B", l: "Custody assets" },
+            ].map((s) => (
+              <div key={s.l}>
+                <div className="font-display text-3xl md:text-4xl font-bold text-gold">{s.v}</div>
+                <div className="text-xs uppercase tracking-wider opacity-70 mt-1">{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* IN-BRANCH EXPERIENCE */}
+      <section className="py-20 lg:py-28">
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="order-2 lg:order-1">
+            <div className="text-xs uppercase tracking-widest text-gold mb-3">In-branch & in-app</div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">The warmth of a teller, the speed of the cloud</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              Cash services, notarisation, and document review at our branches — paired with one-tap transfers, virtual cards, and live chat in the app. One ledger, every channel.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              {[
+                { v: "< 2 min", l: "Avg branch wait" },
+                { v: "98%", l: "First-contact resolution" },
+              ].map((s) => (
+                <Card key={s.l} className="p-5 bg-gradient-card">
+                  <div className="font-display text-2xl font-bold text-primary">{s.v}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-1">{s.l}</div>
+                </Card>
+              ))}
+            </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3] order-1 lg:order-2">
+            <img
+              src="https://onemoneyway.com/wp-content/uploads/2024/08/clerk-counting-cash-money-at-bank-office-2023-11-27-05-01-17-utc-1.jpg"
+              alt="Crest Nova teller serving a client"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FLAGSHIP HQ */}
+      <section className="py-20 lg:py-28 bg-surface">
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3]">
+            <img
+              src="https://lpc.com/wp-content/uploads/Bank-Building_Hero_V2.jpeg"
+              alt="Crest Nova flagship headquarters"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <div className="text-xs uppercase tracking-widest text-gold mb-3">Our headquarters</div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">Anchored on Park Avenue. At home everywhere else.</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              Our New York flagship hosts the trading floor, the private banking lounge, and a 24/7 client studio. Visit us in person — or let us come to you, anywhere in the world.
+            </p>
+            <Button asChild variant="outline" size="lg" className="mt-6">
+              <Link to="/contact">Plan a visit</Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+
+
       {/* TESTIMONIALS */}
       <section className="py-20 lg:py-28 bg-surface overflow-hidden">
         <div className="container mx-auto px-4 lg:px-8">
