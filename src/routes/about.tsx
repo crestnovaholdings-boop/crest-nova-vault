@@ -56,13 +56,23 @@ function AboutPage() {
               Today we serve clients across six continents from a single, secure platform — with a 24/7 concierge desk staffed by real people who care.
             </p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="grid grid-cols-2 gap-4">
-            {stats.map((s) => (
-              <Card key={s.l} className="p-6 text-center bg-gradient-card">
-                <div className="font-display text-3xl font-bold text-primary">{s.v}</div>
-                <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2">{s.l}</div>
-              </Card>
-            ))}
+          <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="space-y-4">
+            <div className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3]">
+              <img
+                src="https://s.hdnux.com/photos/01/41/40/63/25562360/3/ratio3x2_1920.jpg"
+                alt="Inside a Crest Nova banking hall"
+                loading="lazy"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {stats.map((s) => (
+                <Card key={s.l} className="p-6 text-center bg-gradient-card">
+                  <div className="font-display text-3xl font-bold text-primary">{s.v}</div>
+                  <div className="text-xs uppercase tracking-widest text-muted-foreground mt-2">{s.l}</div>
+                </Card>
+              ))}
+            </div>
           </motion.div>
         </div>
       </section>

@@ -55,6 +55,26 @@ function ServicesPage() {
         </div>
       </section>
 
+      <section className="py-20 bg-surface">
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="text-xs uppercase tracking-widest text-gold mb-3">Built around you</div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">Real bankers. Real branches. Real reach.</h2>
+            <p className="mt-4 text-muted-foreground leading-relaxed">
+              Behind every Crest Nova product is a global team of bankers, advisors, and engineers — ready to help you make the next move with confidence.
+            </p>
+          </div>
+          <div className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3]">
+            <img
+              src="https://lpc.com/wp-content/uploads/Bank-Building_Hero_V2.jpeg"
+              alt="Crest Nova flagship building"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
       <CTASection />
     </SimplePage>
   );
