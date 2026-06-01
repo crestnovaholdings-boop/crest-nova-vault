@@ -60,19 +60,29 @@ function BankingPage() {
       </section>
 
       <section className="py-20 bg-surface">
-        <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
-          <div className="text-xs uppercase tracking-widest text-gold mb-3">Everything included</div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold">A premium account, without the premium price</h2>
-          <ul className="mt-8 grid sm:grid-cols-2 gap-3">
-            {benefits.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-sm">
-                <span className="mt-0.5 w-5 h-5 rounded-full bg-gold/15 text-gold flex items-center justify-center shrink-0">
-                  <Check className="h-3 w-3" />
-                </span>
-                {b}
-              </li>
-            ))}
-          </ul>
+        <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
+          <div className="relative rounded-3xl overflow-hidden shadow-elegant aspect-[4/3] order-2 lg:order-1">
+            <img
+              src="https://onemoneyway.com/wp-content/uploads/2024/08/clerk-counting-cash-money-at-bank-office-2023-11-27-05-01-17-utc-1.jpg"
+              alt="Bank clerk handling cash"
+              loading="lazy"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </div>
+          <div className="order-1 lg:order-2">
+            <div className="text-xs uppercase tracking-widest text-gold mb-3">Everything included</div>
+            <h2 className="font-display text-3xl md:text-4xl font-bold">A premium account, without the premium price</h2>
+            <ul className="mt-8 grid sm:grid-cols-2 gap-3">
+              {benefits.map((b) => (
+                <li key={b} className="flex items-start gap-3 text-sm">
+                  <span className="mt-0.5 w-5 h-5 rounded-full bg-gold/15 text-gold flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3" />
+                  </span>
+                  {b}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
