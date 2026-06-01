@@ -180,40 +180,76 @@ export type Database = {
         Row: {
           account_status: Database["public"]["Enums"]["account_status"]
           address: string | null
+          annual_income: string | null
           avatar_url: string | null
+          city: string | null
           country: string | null
           created_at: string
+          date_of_birth: string | null
           email: string | null
+          employment_status: string | null
           full_name: string | null
           id: string
           kyc_status: Database["public"]["Enums"]["kyc_status"]
+          marketing_opt_in: boolean
+          occupation: string | null
           phone: string | null
+          postal_code: string | null
+          preferred_account_type: string | null
+          preferred_currency: string | null
+          source_of_funds: string | null
+          state_region: string | null
+          tax_id_last4: string | null
           updated_at: string
         }
         Insert: {
           account_status?: Database["public"]["Enums"]["account_status"]
           address?: string | null
+          annual_income?: string | null
           avatar_url?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
+          employment_status?: string | null
           full_name?: string | null
           id: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          marketing_opt_in?: boolean
+          occupation?: string | null
           phone?: string | null
+          postal_code?: string | null
+          preferred_account_type?: string | null
+          preferred_currency?: string | null
+          source_of_funds?: string | null
+          state_region?: string | null
+          tax_id_last4?: string | null
           updated_at?: string
         }
         Update: {
           account_status?: Database["public"]["Enums"]["account_status"]
           address?: string | null
+          annual_income?: string | null
           avatar_url?: string | null
+          city?: string | null
           country?: string | null
           created_at?: string
+          date_of_birth?: string | null
           email?: string | null
+          employment_status?: string | null
           full_name?: string | null
           id?: string
           kyc_status?: Database["public"]["Enums"]["kyc_status"]
+          marketing_opt_in?: boolean
+          occupation?: string | null
           phone?: string | null
+          postal_code?: string | null
+          preferred_account_type?: string | null
+          preferred_currency?: string | null
+          source_of_funds?: string | null
+          state_region?: string | null
+          tax_id_last4?: string | null
           updated_at?: string
         }
         Relationships: []
