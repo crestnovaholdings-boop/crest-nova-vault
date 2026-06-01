@@ -106,7 +106,7 @@ const schema = z
       .regex(/[a-z]/, "Add a lowercase letter")
       .regex(/[0-9]/, "Add a number"),
     confirm_password: z.string(),
-    marketing_opt_in: z.boolean().default(false),
+    marketing_opt_in: z.boolean(),
     terms_accepted: z.literal(true, { message: "You must accept the terms" }),
   })
   .refine((d) => d.password === d.confirm_password, {
