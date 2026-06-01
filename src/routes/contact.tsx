@@ -51,6 +51,7 @@ function ContactPage() {
         eyebrow="We're here"
         title="Talk to a real human, 24/7"
         subtitle="Our concierge team replies in minutes — not days. Reach us however you like."
+        bgImage="https://media.istockphoto.com/id/1927881398/photo/group-of-business-persons-talking-in-the-office.jpg"
       />
 
       <section className="py-20">

@@ -89,7 +89,12 @@ function Index() {
     <SiteLayout>
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-hero" />
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url(https://lpc.com/wp-content/uploads/Bank-Building_Hero_V2.jpeg)" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, oklch(0.18 0.06 260 / 0.92), oklch(0.22 0.08 260 / 0.78))" }} />
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 20% 30%, oklch(0.78 0.11 80 / 0.4), transparent 50%), radial-gradient(circle at 80% 70%, oklch(0.6 0.2 260 / 0.5), transparent 50%)" }} />
 
         <div className="relative container mx-auto px-4 lg:px-8 py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">

@@ -40,6 +40,7 @@ function BankingPage() {
         eyebrow="Online banking"
         title="Banking that finally feels modern"
         subtitle="A single app for every account, every currency, every goal — backed by humans whenever you need them."
+        bgImage="https://dashboard.thefinanser.com/wp-content/uploads/2025/05/Branches.jpg"
       />
 
       <section className="py-20">
