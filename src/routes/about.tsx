@@ -41,6 +41,7 @@ function AboutPage() {
         eyebrow="Our story"
         title="Banking, reimagined for a global generation"
         subtitle="Founded by veterans of private banking and fintech, Crest Nova exists to make premium financial services feel effortless — wherever you live, work, or invest."
+        bgImage="https://media.istockphoto.com/id/1927881398/photo/group-of-business-persons-talking-in-the-office.jpg"
       />
 
       <section className="py-20">
