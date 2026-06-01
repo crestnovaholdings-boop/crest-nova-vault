@@ -33,6 +33,7 @@ function LoansPage() {
         eyebrow="Borrow with confidence"
         title="Loans designed around your life"
         subtitle="Decisions in minutes, transparent pricing, and human advisors when the numbers get serious."
+        bgImage="https://s.hdnux.com/photos/01/41/40/63/25562360/3/ratio3x2_1920.jpg"
       />
 
       <section className="py-20">
