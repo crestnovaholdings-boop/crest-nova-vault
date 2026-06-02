@@ -38,3 +38,5 @@ export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>,
   },
 });
 
+console.log("BUILD URL:", import.meta.env.VITE_SUPABASE_URL);
+console.log("BUILD KEY:", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
