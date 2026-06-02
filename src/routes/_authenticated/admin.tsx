@@ -12,15 +12,16 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminShell() {
-  const { session, loading, isAdmin } = useAuth();
+  const { session, loading, isAdmin, rolesLoaded } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) return;
-    if (!session) navigate({ to: "/login", replace: true });
-    else if (!isAdmin) navigate({ to: "/app", replace: true });
-  }, [session, loading, isAdmin, navigate]);
+    if (!session) { navigate({ to: "/login", replace: true }); return; }
+    if (!rolesLoaded) return;
+    if (!isAdmin) navigate({ to: "/app", replace: true });
+  }, [session, loading, isAdmin, rolesLoaded, navigate]);
 
-  if (loading || !session || !isAdmin) {
+  if (loading || !session || !rolesLoaded || !isAdmin) {
     return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   }
 
