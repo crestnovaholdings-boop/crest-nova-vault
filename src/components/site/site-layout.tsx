@@ -12,6 +12,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <Footer />
       <FloatingWhatsApp />
       <BackToTop />
+      <TawkTo />
     </div>
   );
 }
