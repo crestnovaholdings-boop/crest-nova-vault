@@ -59,7 +59,7 @@ function ContactPage() {
           <div className="space-y-4">
             {[
               { icon: Mail, label: "Email", value: "info@crestnovaholdings.com" },
-              { icon: Phone, label: "Phone", value: "+1 (555) 000-0000" },
+              { icon: Phone, label: "Phone", value: "+1 (272) 363-8441" },
               { icon: MapPin, label: "HQ", value: "200 Park Avenue, New York, NY" },
             ].map((c) => (
               <Card key={c.label} className="p-5 flex items-start gap-4">

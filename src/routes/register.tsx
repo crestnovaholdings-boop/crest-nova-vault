@@ -361,7 +361,7 @@ function RegisterPage() {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 555 123 4567" {...field} />
+                      <Input placeholder="+1 (272) 363-8441" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
