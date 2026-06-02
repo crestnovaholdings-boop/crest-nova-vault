@@ -22,12 +22,12 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { session, isAdmin } = useAuth();
+  const { session, isAdmin, rolesLoaded } = useAuth();
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (session) navigate({ to: isAdmin ? "/admin" : "/app", replace: true });
-  }, [session, isAdmin, navigate]);
+    if (session && rolesLoaded) navigate({ to: isAdmin ? "/admin" : "/app", replace: true });
+  }, [session, isAdmin, rolesLoaded, navigate]);
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),

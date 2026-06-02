@@ -8,6 +8,7 @@ type AuthCtx = {
   user: User | null;
   loading: boolean;
   isAdmin: boolean;
+  rolesLoaded: boolean;
   signOut: () => Promise<void>;
 };
 
@@ -17,26 +18,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [rolesLoaded, setRolesLoaded] = useState(false);
   const queryClient = useQueryClient();
 
   useEffect(() => {
+    let currentUserId: string | null = null;
+
+    const loadRole = (userId: string) => {
+      setRolesLoaded(false);
+      supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle()
+        .then(({ data }) => {
+          setIsAdmin(!!data);
+          setRolesLoaded(true);
+        });
+    };
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
-      queryClient.invalidateQueries();
+      setLoading(false);
+
+      const newUserId = newSession?.user?.id ?? null;
+      const userChanged = newUserId !== currentUserId;
+      currentUserId = newUserId;
+
+      // Only invalidate queries on actual sign-in/sign-out, not token refreshes
+      if (event === "SIGNED_IN" || event === "SIGNED_OUT" || event === "USER_UPDATED") {
+        queryClient.invalidateQueries();
+      }
+
       if (newSession?.user) {
-        setTimeout(() => {
-          supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", newSession.user.id)
-            .eq("role", "admin")
-            .maybeSingle()
-            .then(({ data }) => setIsAdmin(!!data));
-        }, 0);
+        if (userChanged) {
+          setTimeout(() => loadRole(newSession.user.id), 0);
+        }
       } else {
         setIsAdmin(false);
+        setRolesLoaded(true);
       }
     });
 
@@ -44,13 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(data.session);
       setLoading(false);
       if (data.session?.user) {
-        supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", data.session.user.id)
-          .eq("role", "admin")
-          .maybeSingle()
-          .then(({ data }) => setIsAdmin(!!data));
+        currentUserId = data.session.user.id;
+        loadRole(data.session.user.id);
+      } else {
+        setRolesLoaded(true);
       }
     });
 
@@ -62,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, isAdmin, signOut }}>
+    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, isAdmin, rolesLoaded, signOut }}>
       {children}
     </AuthContext.Provider>
   );
