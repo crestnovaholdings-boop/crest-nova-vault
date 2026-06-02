@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Navbar } from "./navbar";
 import { Footer } from "./footer";
 import { FloatingWhatsApp, BackToTop } from "./floating-buttons";
+import { TawkTo } from "./tawkto";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
