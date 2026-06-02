@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowUp, MessageCircle } from "lucide-react";
 
 // TODO: replace with real WhatsApp number
-const WHATSAPP = "15550000000";
+const WHATSAPP = "12723638441";
 
 export function FloatingWhatsApp() {
   return (
