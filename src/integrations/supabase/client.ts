@@ -2,21 +2,21 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-function createSupabaseClient() {
-  // Use import.meta.env for client-side (Vite build-time replacement)
-  // Fall back to process.env for SSR (server-side rendering)
-  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-  const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_PUBLISHABLE_KEY;
+// Hardcoded fallbacks so the app works even when build-time env vars
+// (e.g. on self-hosted Cloudflare) are missing. Publishable/anon key is
+// safe to expose — it is a public key gated by RLS.
+const FALLBACK_SUPABASE_URL = 'https://irigretbbszpjnadlpxp.supabase.co';
+const FALLBACK_SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyaWdyZXRiYnN6cGpuYWRscHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODI3MzgsImV4cCI6MjA5NTY1ODczOH0.nG64lFdLzUzGcF5LiYtQUbUAyfYuj8ADOsGjRH08quw';
 
-  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-    const missing = [
-      ...(!SUPABASE_URL ? ['SUPABASE_URL'] : []),
-      ...(!SUPABASE_PUBLISHABLE_KEY ? ['SUPABASE_PUBLISHABLE_KEY'] : []),
-    ];
-    const message = `Missing Supabase environment variable(s): ${missing.join(', ')}. Connect Supabase in Lovable Cloud.`;
-    console.error(`[Supabase] ${message}`);
-    throw new Error(message);
-  }
+function createSupabaseClient() {
+  const SUPABASE_URL =
+    import.meta.env.VITE_SUPABASE_URL ||
+    (typeof process !== 'undefined' ? process.env.SUPABASE_URL : undefined) ||
+    FALLBACK_SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY =
+    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+    (typeof process !== 'undefined' ? process.env.SUPABASE_PUBLISHABLE_KEY : undefined) ||
+    FALLBACK_SUPABASE_PUBLISHABLE_KEY;
 
   return createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
@@ -37,6 +37,3 @@ export const supabase = new Proxy({} as ReturnType<typeof createSupabaseClient>,
     return Reflect.get(_supabase, prop, receiver);
   },
 });
-
-console.log("BUILD URL:", import.meta.env.VITE_SUPABASE_URL);
-console.log("BUILD KEY:", import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
