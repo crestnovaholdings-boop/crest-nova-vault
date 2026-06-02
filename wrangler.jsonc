@@ -1,0 +1,7 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "crest-nova-vault",
+  "main": "./dist/server/server.js",
+  "compatibility_date": "2026-06-02",
+  "compatibility_flags": ["nodejs_compat"]
+}
