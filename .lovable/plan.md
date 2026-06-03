@@ -1,56 +1,46 @@
+## Short answer
 
-## What's happening
+No — the service role key is **not** required for the admin panel. It currently bypasses RLS for convenience, but the same operations can run as the signed-in admin user if we add RLS policies that grant admins access using the existing `has_role(auth.uid(), 'admin')` function.
 
-Two symptoms, one root cause: your self-hosted Cloudflare build doesn't have the Supabase env vars baked in.
+## Plan
 
-1. **"Missing env variables" in console** → `src/integrations/supabase/client.ts` reads `import.meta.env.VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`. Vite inlines these **at build time**. If they're missing during `bun run build` on Cloudflare, the client throws on first use.
-2. **"Page not found" after login** → the login handler calls `supabase.auth.signInWithPassword`, which throws because the Supabase client can't initialize without those env vars. The redirect to `/app` then renders against a crashed auth context, surfacing as 404/blank.
+### 1. Database migration: add admin RLS policies
 
-I checked: `.env` is **tracked in git** and not ignored, but Cloudflare's build pipeline does **not** automatically load committed `.env` files unless you tell it to — and even when it does, secrets should live in the Cloudflare dashboard, not in the repo.
+Add `admin`-scoped policies (using `public.has_role(auth.uid(), 'admin')`) on every table the admin panel touches, so an authenticated admin user can perform the same reads/writes the service role currently does:
 
-## Fix (one-time setup)
+- `profiles` — admin SELECT/UPDATE all rows
+- `accounts` — admin SELECT all rows
+- `transactions` — admin SELECT/UPDATE all rows
+- `user_roles` — admin SELECT all rows
+- `notifications` — admin INSERT (so `apply_transaction` / `reject_transaction` notifications still work; those are SECURITY DEFINER so already fine, but covers any direct inserts)
+- `cms_content` — admin SELECT/INSERT/UPDATE
+- `admin_activity_log` — admin SELECT/INSERT
 
-### 1. Add the build-time env vars in Cloudflare
+Also ensure the RPCs `apply_transaction` and `reject_transaction` (already `SECURITY DEFINER`) can be called by authenticated admins — grant `EXECUTE` to `authenticated` if not already, and add an internal `has_role` check at the top of each so non-admins can't call them.
 
-In the Cloudflare dashboard → your Workers/Pages project → **Settings → Variables and Secrets → Build-time variables** (or **Environment variables** for Pages), add for the **Production** environment:
+### 2. Rewrite `src/lib/banking.functions.ts`
 
-```
-VITE_SUPABASE_URL              = https://irigretbbszpjnadlpxp.supabase.co
-VITE_SUPABASE_PUBLISHABLE_KEY  = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlyaWdyZXRiYnN6cGpuYWRscHhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODI3MzgsImV4cCI6MjA5NTY1ODczOH0.nG64lFdLzUzGcF5LiYtQUbUAyfYuj8ADOsGjRH08quw
-VITE_SUPABASE_PROJECT_ID       = irigretbbszpjnadlpxp
-```
+- Drop `supabaseAdmin` import entirely.
+- Replace every `supabaseAdmin.from(...)` call inside admin server functions with `context.supabase` (the user-scoped client from `requireSupabaseAuth`). RLS will enforce admin access.
+- Keep `requireAdmin(userId)` as a defense-in-depth check using `context.supabase` reading `user_roles`.
+- `completeRegistrationProfile`: this is the one tricky case — it runs right after sign-up before the user has any custom claims and writes to `profiles`. Convert it to require auth (`requireSupabaseAuth`) and write via `context.supabase`; the existing self-update RLS policy on `profiles` already covers `auth.uid() = id`. Remove the write-once `tax_id_last4` guard from the server (RLS + a CHECK or trigger can enforce it) or keep it as an app-level check via `context.supabase`.
+- `verifyAdmin`: use `context.supabase` to read `user_roles`.
 
-These must be **build-time** (not just runtime) because Vite replaces `import.meta.env.VITE_*` during the build, not at request time. The publishable/anon key is safe to expose — it's already public.
+### 3. Update `src/integrations/supabase/client.server.ts` usage
 
-### 2. Add the runtime (server-side) vars as Worker secrets
-
-For `requireSupabaseAuth` and `supabaseAdmin` (server functions running in the Worker), add as **Worker secrets / runtime variables**:
-
-```
-SUPABASE_URL                   = https://irigretbbszpjnadlpxp.supabase.co
-SUPABASE_PUBLISHABLE_KEY       = (same anon key as above)
-SUPABASE_SERVICE_ROLE_KEY      = (from Lovable Cloud → Backend → API keys; service_role)
-```
-
-Mark `SUPABASE_SERVICE_ROLE_KEY` as an **encrypted secret** — never commit it.
-
-### 3. Trigger a fresh build
-
-Push an empty commit or click **Retry deployment** in Cloudflare so the new env values are picked up. The deploy from before the variables existed is permanently broken — no amount of redeploying the same artifact will fix it.
+No code change to the file itself (auto-generated), but after step 2 nothing in the project imports it anymore. The `SUPABASE_SERVICE_ROLE_KEY` env var becomes unused and can be left unset in Cloudflare.
 
 ### 4. Verify
 
-After deploy:
-- Open the site, check console: no "missing env variable" error.
-- Log in → should land on `/app` (or `/admin`) cleanly.
+- Log in as admin → admin panel loads, lists users/transactions, approve/reject works.
+- Log in as regular user → `/admin` redirects to `/app` (existing `beforeLoad` guard still works because `verifyAdmin` now runs as the user).
+- Sign up a new user → registration completes and profile fields persist.
 
-## Why not just commit `.env`?
+## Technical notes
 
-It's already tracked, but:
-- The service role key must **never** sit in git.
-- Cloudflare-managed env vars are the standard mechanism and survive repo rewrites, branch switches, and preview vs production differences.
-- Keeps your Lovable preview and Cloudflare prod from drifting.
+- The `handle_new_user` trigger is `SECURITY DEFINER` so it still runs on signup without RLS issues.
+- `apply_transaction` / `reject_transaction` are `SECURITY DEFINER` — they bypass RLS when updating balances and inserting notifications, so step 1's notification policy is only needed if any direct inserts happen.
+- No frontend route or component changes needed beyond what the rewritten server fns return.
+- Result: Cloudflare deployment needs **zero** secrets. Everything runs with the public anon key + the user's bearer token.
 
-## Notes
-
-No code changes needed — the app is wired correctly. This is purely deployment configuration on Cloudflare's side. Once set, you won't need to repeat it unless you rotate keys.
+Want me to proceed?
