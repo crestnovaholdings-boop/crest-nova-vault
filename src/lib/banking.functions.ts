@@ -141,6 +141,59 @@ export const requestTransaction = createServerFn({ method: "POST" })
 
 /* ============ ADMIN ============ */
 
+export const verifyAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId)
+      .eq("role", "admin")
+      .maybeSingle();
+    return { isAdmin: !!data };
+  });
+
+/* ============ REGISTRATION PROFILE COMPLETION ============ */
+
+const completeProfileSchema = z.object({
+  user_id: z.string().uuid(),
+  date_of_birth: z.string().optional().nullable(),
+  tax_id_last4: z.string().regex(/^\d{4}$/).optional().nullable(),
+  phone: z.string().max(20).optional().nullable(),
+  address: z.string().max(200).optional().nullable(),
+  city: z.string().max(80).optional().nullable(),
+  state_region: z.string().max(80).optional().nullable(),
+  postal_code: z.string().max(20).optional().nullable(),
+  country: z.string().max(80).optional().nullable(),
+  occupation: z.string().max(120).optional().nullable(),
+  employment_status: z.string().max(40).optional().nullable(),
+  annual_income: z.string().max(40).optional().nullable(),
+  source_of_funds: z.string().max(40).optional().nullable(),
+});
+
+// Public endpoint called immediately after sign-up to persist sensitive
+// profile data without embedding it in the auth JWT/user_metadata.
+// First-write only: refuses to overwrite once tax_id_last4 is already set.
+export const completeRegistrationProfile = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => completeProfileSchema.parse(d))
+  .handler(async ({ data }) => {
+    const { user_id, ...fields } = data;
+    const { data: existing } = await supabaseAdmin
+      .from("profiles")
+      .select("tax_id_last4")
+      .eq("id", user_id)
+      .maybeSingle();
+    if (!existing) throw new Error("Profile not found");
+    if (existing.tax_id_last4) throw new Error("Profile already completed");
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update(fields)
+      .eq("id", user_id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
