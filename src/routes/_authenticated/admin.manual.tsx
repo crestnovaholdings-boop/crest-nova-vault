@@ -45,7 +45,7 @@ function Page() {
 
   const onSubmit = async (v: z.infer<typeof schema>) => {
     setLoading(true);
-    try { await createFn({ data: v }); toast.success("Posted to ledger"); form.reset(); qc.invalidateQueries({ queryKey: ["admin-overview"] }); qc.invalidateQueries({ queryKey: ["admin-all-txns"] }); }
+    try { await createFn({ data: v }); toast.success("Submitted for approval"); form.reset(); qc.invalidateQueries({ queryKey: ["admin-overview"] }); qc.invalidateQueries({ queryKey: ["admin-pending-txns"] }); qc.invalidateQueries({ queryKey: ["admin-all-txns"] }); }
     catch (e) { toast.error((e as Error).message); } finally { setLoading(false); }
   };
 
