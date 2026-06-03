@@ -1,30 +1,24 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/dashboard/admin-sidebar";
-import { useAuth } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
-import { Loader2 } from "lucide-react";
+import { verifyAdmin } from "@/lib/banking.functions";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — Crest Nova Holdings" }] }),
+  beforeLoad: async () => {
+    try {
+      const { isAdmin } = await verifyAdmin();
+      if (!isAdmin) throw redirect({ to: "/app", replace: true });
+    } catch (e) {
+      if (e && typeof e === "object" && "isRedirect" in e) throw e;
+      throw redirect({ to: "/app", replace: true });
+    }
+  },
   component: AdminShell,
 });
 
 function AdminShell() {
-  const { session, loading, isAdmin, rolesLoaded } = useAuth();
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (loading) return;
-    if (!session) { navigate({ to: "/login", replace: true }); return; }
-    if (!rolesLoaded) return;
-    if (!isAdmin) navigate({ to: "/app", replace: true });
-  }, [session, loading, isAdmin, rolesLoaded, navigate]);
-
-  if (loading || !session || !rolesLoaded || !isAdmin) {
-    return <div className="flex min-h-screen items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
-  }
-
   return (
     <SidebarProvider>
       <AdminSidebar />
