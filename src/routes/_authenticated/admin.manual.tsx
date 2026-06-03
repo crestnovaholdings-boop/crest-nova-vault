@@ -51,7 +51,7 @@ function Page() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div><h1 className="text-2xl font-display flex items-center gap-2"><PlusCircle className="h-5 w-5 text-gold" /> Manual transaction</h1><p className="text-sm text-muted-foreground">Applied to the ledger immediately.</p></div>
+      <div><h1 className="text-2xl font-display flex items-center gap-2"><PlusCircle className="h-5 w-5 text-gold" /> Manual transaction</h1><p className="text-sm text-muted-foreground">Creates a pending entry. Approve it from the Approvals page to update the user's balance.</p></div>
       <Card>
         <CardHeader><CardTitle className="text-base">New manual entry</CardTitle><CardDescription>Use for credits, debits, bonuses, and adjustments.</CardDescription></CardHeader>
         <CardContent>
