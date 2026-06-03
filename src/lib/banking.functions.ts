@@ -333,12 +333,8 @@ export const createManualTransaction = createServerFn({ method: "POST" })
       ...data, status: "pending", created_by: "admin",
     }).select("id").single();
     if (error || !inserted) throw new Error(error?.message ?? "insert failed");
-    const { error: rpcErr } = await supabase.rpc("apply_transaction", {
-      _txn_id: inserted.id, _admin_id: context.userId, _note: "Manual admin entry",
-    });
-    if (rpcErr) throw new Error(rpcErr.message);
     await logAdmin(supabase, context.userId, "manual_transaction", "transaction", inserted.id, data);
-    return { ok: true };
+    return { ok: true, id: inserted.id };
   });
 
 export const listCms = createServerFn({ method: "GET" })
