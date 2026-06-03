@@ -10,6 +10,11 @@
   },
 
   "vars": {
-    "SUPABASE_URL": "https://irigretbbszpjnadlpxp.supabase.co"
+    "SUPABASE_URL": "https://irigretbbszpjnadlpxp.supabase.co",
+    "SUPABASE_PUBLISHABLE_KEY": "YOUR_PUBLISHABLE_KEY_HERE",
+
+    "VITE_SUPABASE_URL": "https://irigretbbszpjnadlpxp.supabase.co",
+    "VITE_SUPABASE_PROJECT_ID": "irigretbbszpjnadlpxp",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "YOUR_PUBLISHABLE_KEY_HERE"
   }
 }
