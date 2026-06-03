@@ -1,10 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const requireAdmin = async (userId: string) => {
-  const { data, error } = await supabaseAdmin
+const requireAdmin = async (supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>, userId: string) => {
+  const { data, error } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
@@ -13,8 +12,15 @@ const requireAdmin = async (userId: string) => {
   if (error || !data) throw new Error("Forbidden");
 };
 
-const logAdmin = (admin_id: string, action: string, target_type?: string, target_id?: string, details?: unknown) =>
-  supabaseAdmin.from("admin_activity_log").insert({
+const logAdmin = (
+  supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+  admin_id: string,
+  action: string,
+  target_type?: string,
+  target_id?: string,
+  details?: unknown,
+) =>
+  supabase.from("admin_activity_log").insert({
     admin_id, action, target_type: target_type ?? null, target_id: target_id ?? null,
     details: (details ?? null) as never,
   });
@@ -144,7 +150,7 @@ export const requestTransaction = createServerFn({ method: "POST" })
 export const verifyAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await supabaseAdmin
+    const { data } = await context.supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", context.userId)
@@ -156,7 +162,6 @@ export const verifyAdmin = createServerFn({ method: "GET" })
 /* ============ REGISTRATION PROFILE COMPLETION ============ */
 
 const completeProfileSchema = z.object({
-  user_id: z.string().uuid(),
   date_of_birth: z.string().optional().nullable(),
   tax_id_last4: z.string().regex(/^\d{4}$/).optional().nullable(),
   phone: z.string().max(20).optional().nullable(),
@@ -171,24 +176,24 @@ const completeProfileSchema = z.object({
   source_of_funds: z.string().max(40).optional().nullable(),
 });
 
-// Public endpoint called immediately after sign-up to persist sensitive
-// profile data without embedding it in the auth JWT/user_metadata.
+// Called right after sign-up; user is authenticated and writes their own profile via RLS.
 // First-write only: refuses to overwrite once tax_id_last4 is already set.
 export const completeRegistrationProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => completeProfileSchema.parse(d))
-  .handler(async ({ data }) => {
-    const { user_id, ...fields } = data;
-    const { data: existing } = await supabaseAdmin
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: existing } = await supabase
       .from("profiles")
       .select("tax_id_last4")
-      .eq("id", user_id)
+      .eq("id", userId)
       .maybeSingle();
     if (!existing) throw new Error("Profile not found");
     if (existing.tax_id_last4) throw new Error("Profile already completed");
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from("profiles")
-      .update(fields)
-      .eq("id", user_id);
+      .update(data)
+      .eq("id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -197,12 +202,13 @@ export const completeRegistrationProfile = createServerFn({ method: "POST" })
 export const getAdminOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
     const [users, accounts, txns, pending] = await Promise.all([
-      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
-      supabaseAdmin.from("accounts").select("balance, currency"),
-      supabaseAdmin.from("transactions").select("id, amount, currency, status, type, created_at").order("created_at", { ascending: false }).limit(30),
-      supabaseAdmin.from("transactions").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("accounts").select("balance, currency"),
+      supabase.from("transactions").select("id, amount, currency, status, type, created_at").order("created_at", { ascending: false }).limit(30),
+      supabase.from("transactions").select("id", { count: "exact", head: true }).eq("status", "pending"),
     ]);
     const totalBalance = (accounts.data ?? []).reduce((s, a) => s + Number(a.balance ?? 0), 0);
     return {
@@ -216,8 +222,9 @@ export const getAdminOverview = createServerFn({ method: "GET" })
 export const listUsers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
-    const { data } = await supabaseAdmin.from("profiles").select("*").order("created_at", { ascending: false });
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
     return data ?? [];
   });
 
@@ -225,12 +232,13 @@ export const getUserDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid() }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
     const [{ data: profile }, { data: accounts }, { data: txns }, { data: roles }] = await Promise.all([
-      supabaseAdmin.from("profiles").select("*").eq("id", data.id).maybeSingle(),
-      supabaseAdmin.from("accounts").select("*").eq("user_id", data.id),
-      supabaseAdmin.from("transactions").select("*").eq("user_id", data.id).order("created_at", { ascending: false }).limit(50),
-      supabaseAdmin.from("user_roles").select("role").eq("user_id", data.id),
+      supabase.from("profiles").select("*").eq("id", data.id).maybeSingle(),
+      supabase.from("accounts").select("*").eq("user_id", data.id),
+      supabase.from("transactions").select("*").eq("user_id", data.id).order("created_at", { ascending: false }).limit(50),
+      supabase.from("user_roles").select("role").eq("user_id", data.id),
     ]);
     return { profile, accounts: accounts ?? [], txns: txns ?? [], roles: roles ?? [] };
   });
@@ -243,21 +251,23 @@ export const updateUserStatus = createServerFn({ method: "POST" })
     kyc_status: z.enum(["not_submitted", "pending", "approved", "rejected"]).optional(),
   }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
     const update: { account_status?: "active" | "frozen" | "suspended" | "closed"; kyc_status?: "not_submitted" | "pending" | "approved" | "rejected" } = {};
     if (data.account_status) update.account_status = data.account_status;
     if (data.kyc_status) update.kyc_status = data.kyc_status;
-    const { error } = await supabaseAdmin.from("profiles").update(update).eq("id", data.id);
+    const { error } = await supabase.from("profiles").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
-    await logAdmin(context.userId, "update_user_status", "user", data.id, update);
+    await logAdmin(supabase, context.userId, "update_user_status", "user", data.id, update);
     return { ok: true };
   });
 
 export const listPendingTransactions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
-    const { data } = await supabaseAdmin
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data } = await supabase
       .from("transactions").select("*, profiles:user_id(full_name,email), accounts:account_id(account_number,currency,balance)")
       .eq("status", "pending").order("created_at", { ascending: false });
     return data ?? [];
@@ -266,8 +276,9 @@ export const listPendingTransactions = createServerFn({ method: "GET" })
 export const listAllTransactions = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
-    const { data } = await supabaseAdmin
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data } = await supabase
       .from("transactions").select("*, profiles:user_id(full_name,email)")
       .order("created_at", { ascending: false }).limit(500);
     return data ?? [];
@@ -277,12 +288,13 @@ export const approveTransaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid(), note: z.string().max(500).optional() }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
-    const { error } = await supabaseAdmin.rpc("apply_transaction", {
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { error } = await supabase.rpc("apply_transaction", {
       _txn_id: data.id, _admin_id: context.userId, _note: data.note,
     });
     if (error) throw new Error(error.message);
-    await logAdmin(context.userId, "approve_transaction", "transaction", data.id);
+    await logAdmin(supabase, context.userId, "approve_transaction", "transaction", data.id);
     return { ok: true };
   });
 
@@ -290,12 +302,13 @@ export const rejectTransaction = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ id: z.string().uuid(), note: z.string().max(500).optional() }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
-    const { error } = await supabaseAdmin.rpc("reject_transaction", {
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { error } = await supabase.rpc("reject_transaction", {
       _txn_id: data.id, _admin_id: context.userId, _note: data.note,
     });
     if (error) throw new Error(error.message);
-    await logAdmin(context.userId, "reject_transaction", "transaction", data.id);
+    await logAdmin(supabase, context.userId, "reject_transaction", "transaction", data.id);
     return { ok: true };
   });
 
@@ -310,24 +323,26 @@ export const createManualTransaction = createServerFn({ method: "POST" })
     description: z.string().max(240).optional(),
   }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
-    const { data: inserted, error } = await supabaseAdmin.from("transactions").insert({
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data: inserted, error } = await supabase.from("transactions").insert({
       ...data, status: "pending", created_by: "admin",
     }).select("id").single();
     if (error || !inserted) throw new Error(error?.message ?? "insert failed");
-    const { error: rpcErr } = await supabaseAdmin.rpc("apply_transaction", {
+    const { error: rpcErr } = await supabase.rpc("apply_transaction", {
       _txn_id: inserted.id, _admin_id: context.userId, _note: "Manual admin entry",
     });
     if (rpcErr) throw new Error(rpcErr.message);
-    await logAdmin(context.userId, "manual_transaction", "transaction", inserted.id, data);
+    await logAdmin(supabase, context.userId, "manual_transaction", "transaction", inserted.id, data);
     return { ok: true };
   });
 
 export const listCms = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
-    const { data } = await supabaseAdmin.from("cms_content").select("*").order("key");
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data } = await supabase.from("cms_content").select("*").order("key");
     return data ?? [];
   });
 
@@ -335,19 +350,21 @@ export const updateCms = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ key: z.string().min(1).max(120), value: z.unknown() }))
   .handler(async ({ data, context }) => {
-    await requireAdmin(context.userId);
-    const { error } = await supabaseAdmin.from("cms_content").upsert({
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { error } = await supabase.from("cms_content").upsert({
       key: data.key, value: data.value as never, updated_by: context.userId, updated_at: new Date().toISOString(),
     });
     if (error) throw new Error(error.message);
-    await logAdmin(context.userId, "update_cms", "cms", data.key);
+    await logAdmin(supabase, context.userId, "update_cms", "cms", data.key);
     return { ok: true };
   });
 
 export const listActivityLog = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await requireAdmin(context.userId);
-    const { data } = await supabaseAdmin.from("admin_activity_log").select("*").order("created_at", { ascending: false }).limit(200);
+    const { supabase } = context;
+    await requireAdmin(supabase, context.userId);
+    const { data } = await supabase.from("admin_activity_log").select("*").order("created_at", { ascending: false }).limit(200);
     return data ?? [];
   });
