@@ -11,7 +11,7 @@ export const Route = createFileRoute("/_authenticated/admin")({
       const { isAdmin } = await verifyAdmin();
       if (!isAdmin) throw redirect({ to: "/app", replace: true });
     } catch (e) {
-      if (e && typeof e === "object" && "isRedirect" in e) throw e;
+      if (isRedirect(e)) throw e;
       throw redirect({ to: "/app", replace: true });
     }
   },
