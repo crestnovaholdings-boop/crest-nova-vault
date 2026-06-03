@@ -191,35 +191,54 @@ function RegisterPage() {
 
   const onSubmit = async (values: FormValues) => {
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
       options: {
         emailRedirectTo: window.location.origin + "/app",
+        // Only non-sensitive fields go into auth metadata (it's embedded in
+        // the JWT). Sensitive PII is persisted via a server function below.
         data: {
           full_name: values.full_name,
-          phone: values.phone,
-          country: values.country,
-          address: values.address,
-          city: values.city,
-          state_region: values.state_region,
-          postal_code: values.postal_code,
-          date_of_birth: values.date_of_birth,
-          tax_id_last4: values.tax_id_last4,
-          occupation: values.occupation,
-          employment_status: values.employment_status,
-          annual_income: values.annual_income,
-          source_of_funds: values.source_of_funds,
           preferred_account_type: values.preferred_account_type,
           preferred_currency: values.preferred_currency,
           marketing_opt_in: values.marketing_opt_in,
         },
       },
     });
+    if (error) {
+      setLoading(false);
+      return toast.error(error.message);
+    }
+    const newUserId = signUpData.user?.id;
+    if (newUserId) {
+      try {
+        const { completeRegistrationProfile } = await import("@/lib/banking.functions");
+        await completeRegistrationProfile({
+          data: {
+            user_id: newUserId,
+            date_of_birth: values.date_of_birth,
+            tax_id_last4: values.tax_id_last4,
+            phone: values.phone,
+            address: values.address,
+            city: values.city,
+            state_region: values.state_region,
+            postal_code: values.postal_code,
+            country: values.country,
+            occupation: values.occupation,
+            employment_status: values.employment_status,
+            annual_income: values.annual_income,
+            source_of_funds: values.source_of_funds,
+          },
+        });
+      } catch {
+        // Non-blocking: user can complete profile later
+      }
+    }
     setLoading(false);
-    if (error) return toast.error(error.message);
     toast.success("Account created. Check your email to verify.");
   };
+
 
   const onGoogle = async () => {
     const res = await lovable.auth.signInWithOAuth("google", {
