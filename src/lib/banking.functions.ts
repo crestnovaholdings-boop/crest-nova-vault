@@ -1,8 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
-const requireAdmin = async (supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>, userId: string) => {
+type SB = SupabaseClient<Database>;
+
+const requireAdmin = async (supabase: SB, userId: string) => {
   const { data, error } = await supabase
     .from("user_roles")
     .select("role")
@@ -13,7 +17,7 @@ const requireAdmin = async (supabase: ReturnType<typeof import("@supabase/supaba
 };
 
 const logAdmin = (
-  supabase: ReturnType<typeof import("@supabase/supabase-js").createClient>,
+  supabase: SB,
   admin_id: string,
   action: string,
   target_type?: string,
