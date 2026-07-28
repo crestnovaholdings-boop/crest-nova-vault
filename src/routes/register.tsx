@@ -236,7 +236,12 @@ function RegisterPage() {
       }
     }
     setLoading(false);
-    toast.success("Account created. Check your email to verify.");
+    if (!signUpData.session) {
+      // Fallback: auto sign-in if no session was returned
+      await supabase.auth.signInWithPassword({ email: values.email, password: values.password });
+    }
+    toast.success("Account created. Welcome to Crest Nova.");
+    navigate({ to: "/app", replace: true });
   };
 
 
