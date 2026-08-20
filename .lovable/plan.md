@@ -1,84 +1,86 @@
-# Cloning Crest Nova Holdings — Full Rebuild Guide
+# Clone prompt for a different Lovable account
 
-A complete recipe to recreate this project (frontend, backend, data, config, deployment) in a brand-new project or environment.
+Note first: a prompt rebuilds the **app** (code, design, schema, logic) identically, but it cannot carry over the **existing rows** in this project's database (users, balances, transactions) — a fresh build starts empty. If you need the live data too, the only exact route is Remix inside the same workspace, or an export/import of the tables afterwards. Everything else below is reproducible from the prompt.
 
-## 1. What exists today
+Copy everything between the lines into the new account's first message.
 
-**Stack:** TanStack Start v1 (React 19, Vite 7, SSR) + Tailwind v4 + shadcn/ui + Framer Motion + Recharts + TanStack Query, backend on Lovable Cloud (Supabase), deployable to Cloudflare Workers.
+---
 
-**Public site routes:** `/` (long-form landing: hero, stats, feature grids, private-banking split, global footprint banner, in-branch section, flagship HQ, CTA), `/about`, `/services`, `/banking`, `/loans`, `/security`, `/contact` (formsubmit.co + map).
+Build a complete premium digital banking platform called **Crest Nova Holdings**. Use TanStack Start (React 19 + Vite, SSR), Tailwind v4, shadcn/ui, Framer Motion, Recharts, TanStack Query, and enable Lovable Cloud for the backend. Build the whole thing in one go — public marketing site, auth, user dashboard, and admin console.
 
-**Auth routes:** `/login`, `/register` (4-step stepper: Personal → Address → Financial → Credentials), `/forgot-password`, `/reset-password`. Email verification is off (auto-confirm). Google OAuth via the Lovable broker.
+**Design system.** Luxury private-bank aesthetic. Define OKLCH semantic tokens in the global stylesheet: deep navy primary, gold accent, soft neutral surfaces, plus glassmorphism utility classes (frosted translucent cards with blur and hairline borders). Never hardcode colours in components. Display serif-adjacent headings paired with a clean sans body. The site must load in **light mode by default** regardless of the OS setting, with a working light/dark toggle. Generous spacing, subtle scroll-reveal animations, animated number counters on stats.
 
-**User dashboard `/app/*`:** overview (charts + balances), accounts, transfers, withdrawals, deposits (proof upload), beneficiaries, transactions, notifications, profile.
+**Public site.** A shared layout with sticky navbar (logo, nav links, theme toggle, Login and Open Account buttons), a rich footer, a Tawk.to live-chat widget, and floating WhatsApp + back-to-top buttons pinned to the **bottom-left**. Contact phone `+1 (229) 689-9274` everywhere, WhatsApp linking to the same number.
 
-**Admin console `/admin/*`:** KPI overview, users (status/KYC control), approvals queue, all-transactions ledger, manual entry, CMS JSON editor, activity log. Admin access is verified server-side (`verifyAdmin`) plus RLS; no service-role key is used anywhere.
+Pages, each with its own SEO title/description and a full-bleed hero header image with a dark gradient overlay:
+- `/` — landing page: hero with headline and dual CTAs, animated stat counters, feature grid, a dashboard mockup preview, a private-banking split section (image beside copy), a full-width global-footprint banner, an in-branch experience section, a flagship-HQ section, testimonials, FAQ accordion, and a closing CTA band.
+- `/about` — mission, values grid, milestones, stats, banking-hall image beside the mission copy.
+- `/services` — detailed product grid (personal, business, wealth, cards, FX, treasury) plus a "real bankers" section with a photo.
+- `/banking` — online/mobile banking features, benefits list beside a teller photo.
+- `/loans` — loan types with indicative rates, eligibility, and a pre-qualification CTA beside a branch photo.
+- `/security` — encryption, fraud monitoring, compliance and insurance pillars.
+- `/contact` — contact form posting to formsubmit.co, office details, hours, and an embedded map.
 
-**Shared shell:** `Navbar`, `Footer`, floating WhatsApp + back-to-top (bottom-left), Tawk.to live chat, light-mode-by-default theme provider.
+Use tasteful stock photography of bank buildings, banking halls, tellers counting cash, and office meetings, reused across headers and side sections.
 
-**Contact details baked into the UI:** phone `+1 (229) 689-9274` (also the WhatsApp link).
+**Auth.** `/login`, `/register`, `/forgot-password`, `/reset-password` on a shared split-screen auth shell. Email/password plus Google sign-in. **Turn email verification off** — a new signup is confirmed instantly and lands straight in the dashboard. Register is a 4-step stepper with Zod validation at every step: Personal (full name, email, phone, date of birth), Address (street, city, state/region, postal code, country), Financial (occupation, employment status, annual income band, source of funds, last 4 of tax ID), Credentials (password + confirm + terms). Sensitive KYC fields must never be written into auth user metadata — persist them to the database through an authenticated server function immediately after signup.
 
-## 2. Clone order (do these in sequence)
+**Database (Lovable Cloud).**
 
-### Step 1 — Copy the codebase
-Copy the whole repo except generated/environment files: skip `node_modules`, `.env`, `src/routeTree.gen.ts` (regenerated on dev start), and `supabase/config.toml` (regenerated with the new project ref). Keep `src/`, `supabase/migrations/`, `package.json`, `vite.config.ts`, `wrangler.jsonc`, `tsconfig.json`, `components.json`, lint/format configs.
+Enums: `app_role` (admin, user); `account_type` (savings, checking, business); `account_status` (active, frozen, suspended, closed); `kyc_status` (pending, approved, rejected, not_submitted); `txn_type` (deposit, withdrawal, transfer, credit, debit, bonus, adjustment); `txn_status` (pending, approved, rejected, reversed).
 
-Do **not** hand-copy `src/integrations/supabase/client.ts`, `client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`, `types.ts` — these are regenerated when Cloud is enabled on the new project. Note that `client.ts` currently carries hardcoded public URL/anon-key fallbacks for Cloudflare; the clone needs the *new* project's values there instead.
+Tables (all in public, each with GRANTs, RLS enabled, and policies):
+- `profiles` — id (PK, references the auth user), full_name, email, phone, country, address, city, state_region, postal_code, date_of_birth, tax_id_last4, occupation, employment_status, annual_income, source_of_funds, avatar_url, kyc_status, account_status, created_at, updated_at.
+- `user_roles` — id, user_id, role (`app_role`), unique(user_id, role). Roles live **only** here, never on profiles.
+- `accounts` — id, user_id, account_number (unique), currency default USD, balance and available_balance numeric(18,2), type, status, created_at.
+- `beneficiaries` — id, user_id, name, bank_name, account_number, swift, iban, country, currency, created_at.
+- `transactions` — id, account_id → accounts, user_id, type, amount numeric(18,2), currency, status default pending, auto-generated `TXN-XXXXXXXXXX` reference, description, beneficiary_id, proof_url, admin_note, created_by ('user' | 'admin'), approved_by, created_at, processed_at.
+- `notifications` — id, user_id, title, body, type, read, created_at.
+- `cms_content` — key (PK), value jsonb, updated_at, updated_by. Publicly readable, admin-writable.
+- `admin_activity_log` — id, admin_id, action, target_type, target_id, details jsonb, ip, user_agent, created_at. Admin read/insert only.
 
-### Step 2 — Enable Cloud on the clone
-Turn on Lovable Cloud so a fresh Supabase project, `.env`, and the integration files are generated.
+Add explicit foreign keys `transactions.user_id → profiles.id` and `accounts.user_id → profiles.id` so admin joins resolve.
 
-### Step 3 — Recreate the schema
-Apply the 7 existing migrations in `supabase/migrations/`, in filename order, byte-for-byte through the migration tool. They create:
+Functions and triggers:
+- `has_role(_user_id, _role)` — SQL, STABLE, SECURITY DEFINER, `search_path = public`. Every admin policy uses it, so policies never recurse.
+- `handle_new_user()` — SECURITY DEFINER trigger on new auth users: creates the profile, creates a USD checking account with a `1000`-prefixed 14-digit number and zero balance, grants the `user` role, inserts a welcome notification, and auto-grants `admin` when the email matches a designated admin address.
+- `apply_transaction(_txn_id, _admin_id, _note)` and `reject_transaction(...)` — SECURITY DEFINER, `EXECUTE` granted to authenticated, each starting with an internal `has_role(auth.uid(),'admin')` check. Approving atomically marks the transaction approved, adjusts the account balance and available balance in the correct direction for the type, stamps processed_at/approved_by, and inserts a user notification. Rejecting marks it rejected with the note and notifies the user.
 
-- **Enums:** `app_role`, `account_type`, `account_status`, `kyc_status`, `txn_type`, `txn_status`
-- **Tables:** `profiles`, `user_roles`, `accounts`, `beneficiaries`, `transactions`, `notifications`, `cms_content`, `admin_activity_log` — each with GRANTs, RLS enabled, and policies (owner-scoped + `has_role(auth.uid(),'admin')`)
-- **Functions:** `has_role` (SECURITY DEFINER), `handle_new_user` trigger (creates profile + a `1000…`-prefixed USD checking account + `user` role + welcome notification, and auto-grants `admin` to a hardcoded email), `apply_transaction` / `reject_transaction` (SECURITY DEFINER, internal admin check, `EXECUTE` granted to `authenticated`)
-- **Later migrations add:** extended KYC profile columns (DOB, tax_id_last4, city, state_region, postal_code, occupation, employment_status, annual_income, source_of_funds), the security-hardening policy rewrites, and explicit FKs `transactions.user_id → profiles.id` and `accounts.user_id → profiles.id` (required so the admin joins resolve)
+RLS: users read and write only their own profiles, accounts, beneficiaries, transactions and notifications; admins get full access through `has_role`. Users may insert transactions only with `status = 'pending'` and only against an account they own. `cms_content` is readable by anyone.
 
-**Change before applying:** the admin auto-grant email inside `handle_new_user` is hardcoded to `info@crestnovaholdings.com`. Set it to the clone's admin address, or drop that block and grant the role manually.
+Storage buckets: `kyc-docs` (private), `payment-proofs` (private), `cms-banners` (public), with owner-scoped policies on the private ones.
 
-### Step 4 — Recreate storage
-Create three buckets: `kyc-docs` (private), `payment-proofs` (private), `cms-banners` (public), plus owner-only read/insert/update/delete policies on the two private buckets. Re-upload any objects that must carry over.
+**Server layer.** All backend logic goes in typed server functions (`createServerFn`) guarded by the Supabase auth middleware — no edge functions. **Do not use the service-role key anywhere**; admin operations run as the signed-in admin and are enforced by RLS plus a server-side role check, so the deployment needs zero secrets.
 
-### Step 5 — Migrate the cloud data
-Order matters because of FKs and the signup trigger.
+**User dashboard `/app/*`** — collapsible sidebar shell:
+- Overview: balance cards, a Recharts balance/activity chart, recent transactions, unread notification count, quick actions.
+- Accounts: account cards with number, type, currency, balance, copy-to-clipboard.
+- Transfers: send money to a saved beneficiary, creates a pending transaction.
+- Withdrawals: withdrawal request form, creates a pending transaction.
+- Deposits: deposit request with proof-of-payment file upload to the private bucket.
+- Beneficiaries: add, list, delete.
+- Transactions: filterable, searchable table with status badges.
+- Notifications: list with mark-as-read.
+- Profile: editable personal details plus read-only KYC status.
 
-1. **Auth users first.** `auth.users` rows cannot be copied by SQL. For each user, create the account in the clone (Auth Admin API or manual invite) and record the **old id → new id** mapping. The `handle_new_user` trigger fires and auto-creates a profile + account + role + notification for each one.
-2. **Export the source data** from the current project, one CSV/JSON per table: `profiles`, `user_roles`, `accounts`, `beneficiaries`, `transactions`, `notifications`, `cms_content`, `admin_activity_log`.
-3. **Import with remapped ids.** Because the trigger already made a profile/account row per user: `UPDATE` profiles (names, phone, address, KYC/status, the extended KYC fields) rather than inserting; either update the trigger-created account or delete it and insert the originals verbatim (keep original `accounts.id` so `transactions.account_id` still resolves). Then insert `beneficiaries`, `transactions` (preserve `reference`, `status`, `created_at`, `processed_at`, remap `approved_by`), `notifications`, `cms_content` (straight copy), `admin_activity_log` (optional; historical audit trail).
-4. **Roles:** insert `user_roles` rows for every admin in the clone; verify each user has exactly the roles they had before.
-5. **Verify:** row counts per table match, `sum(accounts.balance)` matches, no orphan `transactions.account_id`/`user_id`, every user has ≥1 role.
+**Admin console `/admin/*`** — separate sidebar shell, reachable only by admins. The route must verify admin status **server-side** in `beforeLoad` and redirect non-admins to `/app`; never trust a client-side flag alone.
+- Overview: KPI cards (total users, pending approvals, total balance) and recent activity.
+- Users: searchable list, drill into a user's profile, accounts, transactions and roles; change account status and KYC status.
+- Approvals: queue of every pending transaction with user and account details, Approve / Reject with an optional note. Approving is the only thing that moves a balance.
+- Transactions: full ledger with filters.
+- Manual entry: admin creates a deposit/credit/debit/bonus/adjustment for any user's account. It is inserted as **pending** and only affects the balance once approved in Approvals.
+- CMS: JSON editor for `cms_content` keys.
+- Activity: audit log of every admin action.
 
-If the source is a live production site, freeze admin approvals during the export so balances do not drift mid-migration.
+Log every admin action to `admin_activity_log`.
 
-### Step 6 — Auth configuration on the clone
-- Email confirmation **off** (auto-confirm signups).
-- Google provider enabled and configured (needed the same day sign-in goes live, or it errors "Unsupported provider").
-- Site URL + redirect URLs set to the clone's preview and production origins.
-- Password reset redirect pointed at the clone's `/reset-password`.
+**Acceptance criteria.** A new signup lands in the dashboard with no email step and an auto-created account. A user transfer request appears in admin Approvals. Approving it updates the user's balance and sends them a notification. An admin manual entry stays pending until approved. A non-admin visiting `/admin` is redirected to `/app`. Every public page renders in light mode with its hero image, chat widget, and bottom-left floating buttons.
 
-### Step 7 — Third-party bits to re-point
-- **Tawk.to** — `src/components/site/tawkto.tsx` embeds a property-specific widget id; swap for the clone's own property.
-- **formsubmit.co** — the contact form posts to a specific email endpoint; update it and re-confirm the address.
-- **Phone/WhatsApp** — update in `contact.tsx`, `register.tsx`, `floating-buttons.tsx`, and the footer if the clone uses a different number.
-- **Images** — the marketing photos are remote URLs; keep them or re-host.
-- **Branding** — bank name, copy, and SEO `head()` titles/descriptions appear in every route file; update all of them.
+---
 
-### Step 8 — Deployment
-- Publish from Lovable, or push to GitHub and build on Cloudflare Workers.
-- Cloudflare needs the build-time `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` for the clone plus the server-side `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY`. **No service-role key is required** — every admin operation runs as the signed-in admin under RLS.
+## After pasting the prompt
 
-### Step 9 — Acceptance checks on the clone
-Sign up a fresh user → lands in `/app` with an auto-created account, no email step. Request a transfer → appears in admin approvals. Admin approves → user balance updates and a notification arrives. Admin manual entry → stays pending until approved. Non-admin hitting `/admin` → redirected to `/app`. Landing pages render in light mode with images, chat widget, and left-side floating buttons. Contact form delivers.
-
-## 3. Technical notes
-
-- **Design system:** OKLCH tokens in `src/styles.css` (navy primary, gold accent) with glassmorphism utilities; components use semantic tokens only, so the palette can be reskinned by editing tokens alone.
-- **Server boundary:** all backend logic lives in `src/lib/banking.functions.ts` as `createServerFn` handlers with `requireSupabaseAuth`; there are no Supabase edge functions to migrate.
-- **Auth gate:** `src/routes/_authenticated.tsx` (client-only gate) plus a server-side `verifyAdmin()` in `_authenticated/admin.tsx`'s `beforeLoad`.
-- **Known constraint:** the live database was unreachable while writing this plan, so exact row counts and current CMS keys are not listed here — Step 5's export will enumerate them.
-
-## 4. Effort shape
-
-Code copy + Cloud enable + migrations: fast and mechanical. The real work is Step 5 (auth user recreation and id remapping) and Step 7 (third-party re-pointing). Budget most of the time there.
+1. Replace the admin auto-grant email in `handle_new_user` with your own, then sign up with it to get the admin role.
+2. Re-point the third-party bits to your own accounts: Tawk.to property id, formsubmit.co endpoint, phone/WhatsApp number if different.
+3. Configure Google sign-in and set the site/redirect URLs.
+4. If you also need this project's existing rows, export each table here and import them into the clone after recreating the auth users (ids will differ, so remap `user_id`/`account_id` on the way in).
