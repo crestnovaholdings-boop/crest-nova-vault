@@ -58,7 +58,7 @@ function ContactPage() {
         <div className="container mx-auto px-4 lg:px-8 grid lg:grid-cols-3 gap-8">
           <div className="space-y-4">
             {[
-              { icon: Mail, label: "Email", value: "info@crestnovaholdings.com" },
+              { icon: Mail, label: "Email", value: "info@crestnovaholdings.net" },
               { icon: Phone, label: "Phone", value: "+1 (229) 689-9274" },
               { icon: MapPin, label: "HQ", value: "200 Park Avenue, New York, NY" },
             ].map((c) => (
@@ -88,7 +88,7 @@ function ContactPage() {
             <Form {...form}>
               <form
                 ref={formRef}
-                action="https://formsubmit.co/info@crestnovaholdings.com"
+                action="https://formsubmit.co/info@crestnovaholdings.net"
                 method="POST"
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="mt-6 grid gap-5"
