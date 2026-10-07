@@ -50,7 +50,7 @@ export function Footer() {
         <div>
           <h4 className="font-display text-sm uppercase tracking-widest text-gold mb-4">Newsletter</h4>
           <p className="text-sm opacity-80 mb-4">Get insights from our finance experts.</p>
-          <form action="https://formsubmit.co/info@crestnovaholdings.com" method="POST" className="flex gap-2">
+          <form action="https://formsubmit.co/info@crestnovaholdings.net" method="POST" className="flex gap-2">
             <input type="hidden" name="_subject" value="Newsletter subscription" />
             <input type="hidden" name="_captcha" value="false" />
             <input
